@@ -24,46 +24,46 @@ class User(db.Model, ABC, metaclass=CombinedMeta):
     __abstract__ = True
     
     # Private attributes (marked with - in diagram)
-    _id = db.Column('id', db.String(50), primary_key=True)
-    _name = db.Column('name', db.String(100), nullable=False)
-    _email = db.Column('email', db.String(120), unique=True, nullable=False)
-    _password = db.Column('password', db.String(128), nullable=False)
+    __id = db.Column('id', db.String(50), primary_key=True)
+    __name = db.Column('name', db.String(100), nullable=False)
+    __email = db.Column('email', db.String(120), unique=True, nullable=False)
+    __password = db.Column('password', db.String(128), nullable=False)
 
     # Property getters and setters for encapsulation
     @property
     def id(self):
-        return self._id
+        return self.__id
     
     @id.setter
     def id(self, value):
-        self._id = value
+        self.__id = value
     
     @property
     def name(self):
-        return self._name
+        return self.__name
     
     @name.setter
     def name(self, value):
-        self._name = value
+        self.__name = value
     
     @property
     def email(self):
-        return self._email
+        return self.__email
     
     @email.setter
     def email(self, value):
-        self._email = value
+        self.__email = value
     
     @property
     def password(self):
-        return self._password
+        return self.__password
     
     @password.setter
     def password(self, value):
-        self._password = value
+        self.__password = value
 
     def login(self, password_attempt):
-        return self._password == password_attempt
+        return self.__password == password_attempt
 
     def sign_up(self):
         db.session.add(self)
@@ -75,25 +75,25 @@ class User(db.Model, ABC, metaclass=CombinedMeta):
     
 class Customer(User):
     # Private attributes (marked with - in diagram)
-    _address = db.Column('address', db.String(200))
-    _phone = db.Column('phone', db.String(20))
+    __address = db.Column('address', db.String(200))
+    __phone = db.Column('phone', db.String(20))
     
     # Property getters and setters
     @property
     def address(self):
-        return self._address
+        return self.__address
     
     @address.setter
     def address(self, value):
-        self._address = value
+        self.__address = value
     
     @property
     def phone(self):
-        return self._phone
+        return self.__phone
     
     @phone.setter
     def phone(self, value):
-        self._phone = value
+        self.__phone = value
     
     # Relationships
     orders = db.relationship('Order', backref='customer', lazy=True)
@@ -142,17 +142,8 @@ class Customer(User):
         return self.cart
 
 class Admin(User):
-    # Private attributes (marked with - in diagram)
-    _status = db.Column('status', db.String(50))
-    
-    # Property getters and setters
-    @property
-    def status(self):
-        return self._status
-    
-    @status.setter
-    def status(self, value):
-        self._status = value
+    # Public attributes
+    status = db.Column('status', db.String(50))
 
     def update_data(self, **kwargs):
         if 'status' in kwargs: self.status = kwargs['status']
@@ -183,35 +174,19 @@ class Admin(User):
         pass
 
 class Courier(User):
-    # Private attributes (marked with - in diagram)
-    _status = db.Column('status', db.String(50))
-    _salary = db.Column('salary', db.Float)
-    _area = db.Column('area', db.String(100))
+    # Mixed: public and private attributes
+    status = db.Column('status', db.String(50))
+    __salary = db.Column('salary', db.Float)
+    area = db.Column('area', db.String(100))
     
-    # Property getters and setters
-    @property
-    def status(self):
-        return self._status
-    
-    @status.setter
-    def status(self, value):
-        self._status = value
-    
+    # Property getters and setters for salary only
     @property
     def salary(self):
-        return self._salary
+        return self.__salary
     
     @salary.setter
     def salary(self, value):
-        self._salary = value
-    
-    @property
-    def area(self):
-        return self._area
-    
-    @area.setter
-    def area(self, value):
-        self._area = value
+        self.__salary = value
     
     orders = db.relationship('Order', backref='courier', lazy=True)
 
@@ -251,26 +226,9 @@ class Courier(User):
         db.session.commit()
 
 class ServiceOfferor(User):
-    # Private attributes (marked with - in diagram)
-    _service_type = db.Column('service_type', db.String(50))
-    _area = db.Column('area', db.String(100))
-    
-    # Property getters and setters
-    @property
-    def service_type(self):
-        return self._service_type
-    
-    @service_type.setter
-    def service_type(self, value):
-        self._service_type = value
-    
-    @property
-    def area(self):
-        return self._area
-    
-    @area.setter
-    def area(self, value):
-        self._area = value
+    # Public attributes
+    service_type = db.Column('service_type', db.String(50))
+    area = db.Column('area', db.String(100))
     
     products = db.relationship('Product', backref='provider', lazy=True)
 
@@ -297,18 +255,18 @@ class ServiceOfferor(User):
     def to_dict(self):
         return self.get_data()
 
-    def add_products(self, product):
+    def add_products(self, product):      # explain
         product.provider_id = self.id
         db.session.add(product)
         db.session.commit()
 
-    def update_products(self, product, **kwargs):
+    def update_products(self, product, **kwargs):  # explain
         if product.provider_id == self.id:
             if 'name' in kwargs: product.name = kwargs['name']
             if 'price' in kwargs: product.price = kwargs['price']
             db.session.commit()
 
-    def remove_products(self, product_id):
+    def remove_products(self, product_id):          # explain
         prod = Product.query.get(product_id)
         if prod and prod.provider_id == self.id:
             db.session.delete(prod)
@@ -354,44 +312,44 @@ class Product(db.Model):
 
 class Cart(db.Model):
     # Private attributes (marked with - in diagram)
-    _id = db.Column('id', db.String(50), primary_key=True)
-    _price = db.Column('price', db.Float, default=0.0)
+    __id = db.Column('id', db.String(50), primary_key=True)
+    __price = db.Column('price', db.Float, default=0.0)
     customer_id = db.Column(db.String(50), db.ForeignKey('customer.id'), nullable=False)
     
     # Property getters and setters
     @property
     def id(self):
-        return self._id
+        return self.__id
     
     @id.setter
     def id(self, value):
-        self._id = value
+        self.__id = value
     
     @property
     def price(self):
-        return self._price
+        return self.__price
     
     @price.setter
     def price(self, value):
-        self._price = value
+        self.__price = value
     
     products = db.relationship('Product', secondary=cart_products, lazy='subquery',
         backref=db.backref('carts', lazy=True))
 
-    def add_product(self, product):
+    def add_product(self, product):     #explain
         if product not in self.products:
             self.products.append(product)
             self.calculate_price()
             db.session.commit()
 
-    def remove_product(self, product_id):
+    def remove_product(self, product_id):       #explain
         product = next((p for p in self.products if p.id == product_id), None)
         if product:
             self.products.remove(product)
             self.calculate_price()
             db.session.commit()
 
-    def calculate_price(self):
+    def calculate_price(self):      #explain
         self.price = sum(p.price for p in self.products)
         return self.price
 
@@ -404,74 +362,26 @@ class Cart(db.Model):
         pass
 
 class Order(db.Model):
-    # Private attributes (marked with - in diagram)
-    _id = db.Column('id', db.String(50), primary_key=True)
-    _order_date = db.Column('order_date', db.DateTime, default=datetime.utcnow)
-    _status = db.Column('status', db.String(50))
-    _pickup_address = db.Column('pickup_address', db.String(200))
-    _delivery_address = db.Column('delivery_address', db.String(200))
-    _total_weight = db.Column('total_weight', db.Float)
-    _price = db.Column('price', db.Float)
+    # Mixed: private and public attributes
+    __id = db.Column('id', db.String(50), primary_key=True)
+    order_date = db.Column('order_date', db.DateTime, default=datetime.utcnow)
+    status = db.Column('status', db.String(50))
+    pickup_address = db.Column('pickup_address', db.String(200))
+    delivery_address = db.Column('delivery_address', db.String(200))
+    total_weight = db.Column('total_weight', db.Float)
+    price = db.Column('price', db.Float)
     
     customer_id = db.Column(db.String(50), db.ForeignKey('customer.id'), nullable=False)
     courier_id = db.Column(db.String(50), db.ForeignKey('courier.id'), nullable=True)
     
-    # Property getters and setters
+    # Property getters and setters for id only
     @property
     def id(self):
-        return self._id
+        return self.__id
     
     @id.setter
     def id(self, value):
-        self._id = value
-    
-    @property
-    def order_date(self):
-        return self._order_date
-    
-    @order_date.setter
-    def order_date(self, value):
-        self._order_date = value
-    
-    @property
-    def status(self):
-        return self._status
-    
-    @status.setter
-    def status(self, value):
-        self._status = value
-    
-    @property
-    def pickup_address(self):
-        return self._pickup_address
-    
-    @pickup_address.setter
-    def pickup_address(self, value):
-        self._pickup_address = value
-    
-    @property
-    def delivery_address(self):
-        return self._delivery_address
-    
-    @delivery_address.setter
-    def delivery_address(self, value):
-        self._delivery_address = value
-    
-    @property
-    def total_weight(self):
-        return self._total_weight
-    
-    @total_weight.setter
-    def total_weight(self, value):
-        self._total_weight = value
-    
-    @property
-    def price(self):
-        return self._price
-    
-    @price.setter
-    def price(self, value):
-        self._price = value
+        self.__id = value
 
     products = db.relationship('Product', secondary=order_products, lazy='subquery',
         backref=db.backref('orders', lazy=True))
@@ -496,8 +406,11 @@ class Order(db.Model):
 
     def calculate_price(self):
         self.price = sum(p.price for p in self.products if p.price)
-        self.total_weight = sum(p.weight for p in self.products if p.weight)
         return self.price
+    
+    def calculate_weight(self):
+        self.total_weight = sum(p.weight for p in self.products if p.weight)
+        return self.total_weight
 
     def update_status(self, new_stats):
         self.status = new_stats
