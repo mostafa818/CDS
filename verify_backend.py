@@ -4,7 +4,16 @@ import subprocess
 import time
 import os
 
+def clear_db():
+    if os.path.exists("test.db"):
+        try:
+            os.remove("test.db")
+            print("Database cleared.")
+        except Exception as e:
+            print(f"Failed to clear database: {e}")
+
 def run_tests():
+    clear_db()
     print("Starting server...")
     process = subprocess.Popen([sys.executable, "app.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     
@@ -15,7 +24,7 @@ def run_tests():
         # 1. Create Provider
         print("Creating Service Offeror...")
         r = requests.post(f"{base_url}/providers", json={
-            "name": "Tech Supplier", "email": "s@p1.com", "password": "pass",
+            "name": "Tech Supplier", "email": "s@p3.com", "password": "pass",
             "service_type": "Electronics", "area": "NY"
         })
         if r.status_code != 201: raise Exception(f"Provider failed: {r.text}")
@@ -40,7 +49,7 @@ def run_tests():
         # 3. Create Customer
         print("Creating Customer...")
         r = requests.post(f"{base_url}/customers", json={
-            "name": "John1", "email": "j@d2.com", "password": "pass"
+            "name": "John1", "email": "j@d3.com", "password": "pass"
         })
         if r.status_code != 201: raise Exception(f"Customer failed: {r.text}")
         customer_id = r.json()['id']
@@ -87,7 +96,7 @@ def run_tests():
         # 7. Create Admin
         print("Creating Admin...")
         r = requests.post(f"{base_url}/admins", json={
-            "name": "Admin User", "email": "admin@sys.com", "password": "secure",
+            "name": "Admin User", "email": "admin@sys1.com", "password": "secure",
             "status": "Active"
         })
         if r.status_code != 201: raise Exception(f"Create Admin failed: {r.text}")
