@@ -3,10 +3,17 @@
 
 QuickDeliver is a Flask-based full-stack web application that facilitates seamless order processing between Customers, Service Offerors (Restaurants/Shops), Couriers, and Admins.
 
+## 🌐 Live Demo
+**The application is hosted online and accessible at:**  
+**[https://web-production-0c72.up.railway.app/](https://web-production-0c72.up.railway.app/)**
+
+Try it out with the [default credentials](#-default-credentials) below!
+
 ## 🛠️ Tech Stack
 - **Backend**: Python, Flask, Flask-SQLAlchemy, SQLite
 - **Frontend**: Vanilla JavaScript (ES6+), HTML5, CSS3
 - **Architecture**: REST API with role-based access control (RBAC)
+- **Deployment**: Railway (Gunicorn WSGI server)
 
 ## ✨ Key Features
 - **Frontend-Backend Integration**: Full separation of concerns; the frontend communicates exclusively via REST API endpoints.
